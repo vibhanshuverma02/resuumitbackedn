@@ -12,9 +12,9 @@ type CategoryResponse = {
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ pillarId: string }> }
+  context: { params: { pillarId: string } } // ✅ remove Promise<>
 ) {
-  const { pillarId } = await context.params; // 👈 IMPORTANT
+  const { pillarId } = context.params; // 👈 just use directly
 
   const headers = corsHeaders(req.headers.get("origin"));
 
@@ -23,14 +23,12 @@ export async function GET(
       where: { pillar_id: BigInt(pillarId) },
     });
 
-    const safe: CategoryResponse[] = categories.map(
-      (cat: award_category) => ({
-        id: cat.id.toString(),
-        pillar_id: cat.pillar_id.toString(),
-        name: cat.name,
-        description: cat.description,
-      })
-    );
+    const safe: CategoryResponse[] = categories.map((cat: award_category) => ({
+      id: cat.id.toString(),
+      pillar_id: cat.pillar_id.toString(),
+      name: cat.name,
+      description: cat.description,
+    }));
 
     return NextResponse.json(safe, { headers });
   } catch (error) {
